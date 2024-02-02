@@ -7,11 +7,18 @@ const initialItems = [
 ];
 
 export default function App() {
+  const [items, setItems] = useState([]); // we lifted this state and the function handleAddItems because it was needed by other sibling components.
+
+  function handleAddItems(item) {
+    // setItems(item=> items.push(item)) this is forbidden in react as it mutates(changes) the array
+    setItems((items) => [...items, item]);
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems} />
+      <PackingList items={items} />
       <Stats />
     </div>
   );
@@ -21,9 +28,10 @@ function Logo() {
   return <h1>🏝 Far Away 🧳</h1>;
 }
 
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
+
   // e - event, data that u submit and the whole event
   function handleSubmit(e) {
     e.preventDefault();
@@ -33,6 +41,7 @@ function Form() {
     const newItem = { description, quantity, packed: false, id: Date.now() };
     console.log(newItem);
 
+    onAddItems(newItem);
     setDescription("");
     setQuantity(1);
   }
@@ -63,11 +72,11 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({ items }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
+        {items.map((item) => (
           <Item item={item} key={item.id} />
         ))}
       </ul>
